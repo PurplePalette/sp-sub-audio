@@ -1,44 +1,31 @@
-from typing import List, Optional, TypedDict
+from fastapi import FastAPI, UploadFile, BackgroundTasks, HTTPException
+from depends import dependsFile, dependsFileSize, MAXIMUM_FILESIZE
+from task import AudioConversionTask
+
+app = FastAPI()
 
 
-class DbArticle(TypedDict):
-    title: str
-    user_id: str
-    extra_field1: str
-    extra_field2: str
+@app.get("/")
+async def get_root():
+    return {"message": "Server is running."}
 
 
-class Article(TypedDict):
-    title: str
-    user_id: str
-
-
-def get_articles_from_db(userId: str) -> Optional[List[DbArticle]]:
-    return None
-
-
-def get_articles(user_id: str) -> List[Article]:
-    db_article_list = get_articles_from_db(user_id)
-    article_list: List[Article] = []
-
-    if db_article_list is None:
-        return []
-    else:
-        for db_article in db_article_list:
-            article: Article = {
-                "title": db_article["title"],
-                "user_id": db_article["user_id"],
-            }
-            article_list.append(article)
-
-        return article_list
+@app.post("/convert")
+async def upload(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = dependsFile,
+    file_size: int = dependsFileSize,
+):
+    file_type = file.content_type
+    if file_type != "audio/mp3":
+        raise HTTPException(status_code=400, detail="Invalid file type")
+    if file_size > MAXIMUM_FILESIZE:
+        raise HTTPException(status_code=400, detail="File size is too large")
+    background_tasks.add_task(AudioConversionTask(file))
+    return {"message": "started preview generating..."}
 
 
 if __name__ == "__main__":
-    user_id = "alice"
-    article_list = get_articles(user_id)
+    import uvicorn
 
-    if len(article_list) == 0:
-        print("Not found article")
-    else:
-        print(article_list)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
