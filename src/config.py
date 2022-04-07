@@ -28,5 +28,5 @@ def get_bucket() -> Any:
         aws_access_key_id=S3_KEY,
         aws_secret_access_key=S3_SECRET,
     )
-    bucket = s3.Bucket(S3_BUCKET)  # type: ignore
+    bucket = s3.Bucket(S3_BUCKET)
     return bucket
