@@ -1,5 +1,5 @@
-from fastapi import FastAPI, UploadFile, BackgroundTasks, HTTPException
-from depends import dependsFile, dependsFileSize, MAXIMUM_FILESIZE
+from depends import MAXIMUM_FILESIZE, dependsFile, dependsFileSize
+from fastapi import BackgroundTasks, FastAPI, HTTPException, UploadFile
 from task import AudioConversionTask
 
 app = FastAPI()

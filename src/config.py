@@ -1,8 +1,8 @@
 import os
 from os.path import dirname, join
 from typing import Any, cast
-import boto3
 
+import boto3
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True)

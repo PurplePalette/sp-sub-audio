@@ -1,6 +1,5 @@
-from fastapi import Depends, File, Header
 from config import MAXIMUM_FILESIZE
-
+from fastapi import Depends, File, Header
 
 dependsMaximumFileSize = Header(..., lt=MAXIMUM_FILESIZE)
 

@@ -1,9 +1,10 @@
 from enum import Enum
 from hashlib import sha1
-from fastapi import UploadFile
 from tempfile import NamedTemporaryFile
-from pydub import AudioSegment
+
 from config import get_bucket
+from fastapi import UploadFile
+from pydub import AudioSegment
 
 
 class AudioConversionStatus(Enum):
