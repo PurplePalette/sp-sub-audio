@@ -1,48 +1,18 @@
-# python-project-template
+# sonolus-audio-server
+![Python Version](https://img.shields.io/badge/python-v3.8-blue)
+![License](https://img.shields.io/badge/license-AGPLv3%2B-green)
+
+mp3 audio trimming server for sonolus-fastapi
+this server meant micro service to make preview bgm.
+
 
 ## Requirements
+
 * Poetry(>=1.16)
-* Python(>=3.7.x)
+* Python(>=3.8.x)
+* Any S3 storage(Recommends [B2 Cloud Storage](https://www.backblaze.com/b2/cloud-storage.html) with [Cloudflare](https://cloudflare.com/))
 
-## Usage
 
-### Enable Visual Studio Code settings
-
-```bash
-cp .vscode/settings.default.json .vscode/settings.json
-```
-
-### Add package
-```bash
-poetry add [package name]
-```
-
-### Install dependency
-
-development
-```bash
-poetry install
-```
-
-production
-```bash
-poetry install --no-dev
-```
-
-### Run Lint
-
-```bash
-poetry run pysen run lint
-```
-
-### Run format
-
-```bash
-poetry run pysen run format
-```
-
-### Run Test
-
-```bash
-poetry run pytest
-```
+## Docs
+- [API Spec / Stoplight (TODO)](#)
+- [Detailed spec / Whimsical (TODO)](#)
