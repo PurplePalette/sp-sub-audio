@@ -1,6 +1,6 @@
+import asyncio
 import hashlib
 import os
-import subprocess
 
 import botocore.exceptions
 from fastapi import FastAPI
@@ -50,24 +50,22 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
         time_args = ["-t", str(30)]
         end_time = 30
 
-    subprocess.run(
-        [
-            FFMPEG_PATH,
-            "-i",
-            tmp_path + data.hash,
-            "-vn",
-            "-b:a",
-            "128k",
-            "-ar",
-            "44100",
-            "-f",
-            "mp3",
-            *time_args,
-            "-af",
-            f"afade=t=out:st={end_time - 5}:d=5",
-            "-y",
-            tmp_path + dist_filename,
-        ]
+    await asyncio.create_subprocess_exec(
+        FFMPEG_PATH,
+        "-i",
+        tmp_path + data.hash,
+        "-vn",
+        "-b:a",
+        "128k",
+        "-ar",
+        "44100",
+        "-f",
+        "mp3",
+        *time_args,
+        "-af",
+        f"afade=t=out:st={end_time - 5}:d=5",
+        "-y",
+        tmp_path + dist_filename,
     )
 
     with open(tmp_path + dist_filename, "rb") as f:
