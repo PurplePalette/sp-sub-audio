@@ -28,14 +28,10 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
             return JSONResponse(content={"status": "not_found"})
     dist_filename = f"{data.hash}-{data.start}-{data.end}.mp3"
     if data.start is not None and data.end is not None:
-        if data.end - data.start < 0:
-            return JSONResponse(
-                content={"message": "Invalid start and end parameters."}, status_code=400
-            )
+        if data.end - data.start < 1:
+            return JSONResponse(content={"message": "Must be at least 1 second"})
         elif data.end - data.start > 30000:
-            return JSONResponse(
-                content={"message": "Too long duration."}, status_code=400
-            )
+            return JSONResponse(content={"message": "Too long duration."}, status_code=400)
         time_args = [
             "-ss",
             str(data.start / 1000),
