@@ -53,7 +53,8 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
         time_args = ["-t", str(30)]
         end_time = 30
 
-    await asyncio.create_subprocess_exec(
+    dist.write(b"")
+    process = await asyncio.create_subprocess_exec(
         FFMPEG_PATH,
         "-i",
         base.name,
@@ -72,8 +73,12 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
     )
-
+    await process.communicate()
+    if process.returncode != 0:
+        return JSONResponse(content={"message": "Failed to convert.", "ffmpeg_returncode": process.returncode})
+    dist.seek(0)
     cut_hash = hashlib.sha1(dist.read()).hexdigest()
+    dist.seek(0)
     bucket.put_object(
         Key="LevelPreview/" + cut_hash,
         Body=dist,
