@@ -168,6 +168,4 @@ cython_debug/
 .vscode/settings.json
 *.pyc
 *.env
-tmp/*
-!tmp/.gitkeep
 minio_data

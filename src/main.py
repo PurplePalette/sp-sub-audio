@@ -1,6 +1,7 @@
 import asyncio
 import hashlib
 import os
+from tempfile import NamedTemporaryFile
 
 import botocore.exceptions
 from fastapi import FastAPI
@@ -10,7 +11,6 @@ from .config import FFMPEG_PATH, get_bucket
 from .model import GetRootResponse, PostConvertParams, PostConvertResponse
 
 app = FastAPI()
-tmp_path = os.path.dirname(__file__) + "/../tmp/"
 
 
 @app.get("/")
@@ -21,12 +21,15 @@ async def get_root() -> GetRootResponse:
 @app.post("/convert")
 async def upload(data: PostConvertParams) -> PostConvertResponse:
     bucket = get_bucket()
+    base = NamedTemporaryFile()
+    dist = NamedTemporaryFile()
     try:
-        bucket.download_file("LevelBgm/" + data.hash, tmp_path + data.hash)
+        bucket.download_fileobj("LevelBgm/" + data.hash, base)
     except botocore.exceptions.ClientError as e:
+        base.close()
+        dist.close()
         if e.response["Error"]["Code"] == "404":
             return JSONResponse(content={"status": "not_found"})
-    dist_filename = f"{data.hash}-{data.start}-{data.end}.mp3"
     if data.start is not None and data.end is not None:
         if data.end - data.start < 1:
             return JSONResponse(content={"message": "Must be at least 1 second"})
@@ -53,7 +56,7 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
     await asyncio.create_subprocess_exec(
         FFMPEG_PATH,
         "-i",
-        tmp_path + data.hash,
+        base.name,
         "-vn",
         "-b:a",
         "128k",
@@ -65,16 +68,17 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
         "-af",
         f"afade=t=out:st={end_time - 5}:d=5",
         "-y",
-        tmp_path + dist_filename,
+        dist.name,
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
     )
 
-    with open(tmp_path + dist_filename, "rb") as f:
-        cut_hash = hashlib.sha1(f.read()).hexdigest()
+    cut_hash = hashlib.sha1(dist.read()).hexdigest()
     bucket.put_object(
         Key="LevelPreview/" + cut_hash,
-        Body=open(tmp_path + dist_filename, "rb"),
+        Body=dist,
         ContentType="audio/mpeg",
     )
-    os.remove(tmp_path + data.hash)
-    os.remove(tmp_path + dist_filename)
+    base.close()
+    dist.close()
     return JSONResponse(content={"hash": cut_hash})

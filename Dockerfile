@@ -12,8 +12,8 @@ RUN apt-get update && \
 COPY poetry.lock pyproject.toml ./
 RUN pip install poetry==1.0.* && \
     CURL_CA_BUNDLE="" && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-dev
+    poetry config virtualenvs.create false
+RUN poetry install --no-dev
 
 COPY . ./
 
