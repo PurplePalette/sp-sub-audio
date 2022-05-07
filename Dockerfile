@@ -17,4 +17,4 @@ RUN pip install poetry==1.0.* && \
 
 COPY . ./
 
-CMD gunicorn -k uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 src.main:app
+CMD gunicorn -k uvicorn.workers.UvicornWorker --workers 4 --bind=0.0.0.0:8000 src.main:app
