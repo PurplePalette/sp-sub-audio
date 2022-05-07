@@ -2,6 +2,7 @@ import hashlib
 import os
 import subprocess
 
+import botocore.exceptions
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
@@ -20,7 +21,11 @@ async def get_root() -> GetRootResponse:
 @app.post("/convert")
 async def upload(data: PostConvertParams) -> PostConvertResponse:
     bucket = get_bucket()
-    bucket.download_file("LevelBgm/" + data.hash, tmp_path + data.hash)
+    try:
+        bucket.download_file("LevelBgm/" + data.hash, tmp_path + data.hash)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":
+            return JSONResponse(content={"status": "not_found"})
     dist_filename = f"{data.hash}-{data.start}-{data.end}.mp3"
     if data.start is not None and data.end is not None:
         if data.end - data.start < 0:
