@@ -1,6 +1,5 @@
 import asyncio
 import hashlib
-import os
 from tempfile import NamedTemporaryFile
 
 import botocore.exceptions
@@ -34,7 +33,9 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
         if data.end - data.start < 1:
             return JSONResponse(content={"message": "Must be at least 1 second"})
         elif data.end - data.start > 30000:
-            return JSONResponse(content={"message": "Too long duration."}, status_code=400)
+            return JSONResponse(
+                content={"message": "Too long duration."}, status_code=400
+            )
         time_args = [
             "-ss",
             str(data.start / 1000),
@@ -75,7 +76,12 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
     )
     await process.communicate()
     if process.returncode != 0:
-        return JSONResponse(content={"message": "Failed to convert.", "ffmpeg_returncode": process.returncode})
+        return JSONResponse(
+            content={
+                "message": "Failed to convert.",
+                "ffmpeg_returncode": process.returncode,
+            }
+        )
     dist.seek(0)
     cut_hash = hashlib.sha1(dist.read()).hexdigest()
     dist.seek(0)
