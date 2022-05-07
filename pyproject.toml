@@ -12,19 +12,21 @@ fastapi = "^0.75.1"
 boto3 = "^1.21.35"
 uvicorn = "^0.17.6"
 python-multipart = "^0.0.5"
+gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
-pysen = {version = "0.9.1", extras = ["lint"]}
+pysen = {version = "0.10.1", extras = ["lint"]}
 pytest = "^6.2.4"
 pytest-mock = "^3.6.1"
 pytest-sugar = "^0.9.4"
+botostubs = "^0.15.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pysen]
-version = "0.9"
+version = "0.10.1"
 
 [tool.pysen.lint]
 enable_black = true
@@ -32,7 +34,7 @@ enable_flake8 = true
 enable_isort = true
 enable_mypy = true
 mypy_preset = "strict"
-line_length = 88
+line_length = 120
 py_version = "py38"
 [[tool.pysen.lint.mypy_targets]]
   paths = ["src"]
