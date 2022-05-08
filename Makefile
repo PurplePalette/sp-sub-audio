@@ -5,7 +5,7 @@ lint:
 	poetry run pysen run lint
 
 lint-fix:
-	poetry run pysen run format && \
+	poetry run pysen run format
 	poetry run pysen run lint
 
 test-unit:

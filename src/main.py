@@ -33,9 +33,7 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
         if data.end - data.start < 1:
             return JSONResponse(content={"message": "Must be at least 1 second"})
         elif data.end - data.start > 30000:
-            return JSONResponse(
-                content={"message": "Too long duration."}, status_code=400
-            )
+            return JSONResponse(content={"message": "Too long duration."}, status_code=400)
         time_args = [
             "-ss",
             str(data.start / 1000),
