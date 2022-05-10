@@ -1,15 +1,11 @@
 start:
-	if [ -n "${ENV}" ]; then \
-		.venv/bin/dotenv --file ${ENV} run -- .venv/bin/python src/main.py; \
-	else \
-		.venv/bin/dotenv --file .env.dev run -- .venv/bin/python src/main.py; \
-	fi
+	poetry run uvicorn src.main:app --reload
 
 lint:
 	poetry run pysen run lint
 
 lint-fix:
-	poetry run pysen run format && \
+	poetry run pysen run format
 	poetry run pysen run lint
 
 test-unit:
