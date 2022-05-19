@@ -9,7 +9,7 @@ class GetRootResponse(BaseModel):
 
 class PostConvertParams(BaseModel):
     hash: str
-    start: Optional[int] = None
+    start: Optional[int] = 0
     end: Optional[int] = None
 
 
