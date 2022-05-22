@@ -90,5 +90,5 @@ def test_post_convert_error_30sec():
 
 def test_post_convert_error_30sec_end():
     """POST /convert: invalid, longer than 30 seconds, end specified"""
-    response = client.post("/convert", json={"hash": song_hash, "start": 0, "end": 40000})
+    response = client.post("/convert", json={"hash": song_hash, "end": 40000})
     assert response.status_code == 400
