@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import os
 from tempfile import NamedTemporaryFile
 
 import botocore.exceptions
@@ -20,8 +21,8 @@ async def get_root() -> GetRootResponse:
 @app.post("/convert")
 async def upload(data: PostConvertParams) -> PostConvertResponse:
     bucket = get_bucket()
-    base = NamedTemporaryFile()
-    dist = NamedTemporaryFile()
+    base = NamedTemporaryFile(delete=os.name != "nt")
+    dist = NamedTemporaryFile(delete=os.name != "nt")
     try:
         bucket.download_fileobj("LevelBgm/" + data.hash, base)
     except botocore.exceptions.ClientError as e:
@@ -30,8 +31,8 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
         if e.response["Error"]["Code"] == "404":
             return JSONResponse(content={"status": "not_found"})
     if data.start is not None and data.end is not None:
-        if data.end - data.start < 1:
-            return JSONResponse(content={"message": "Must be at least 1 second"})
+        if data.end - data.start < 5000:
+            return JSONResponse(content={"message": "Must be at least 5 second"}, status_code=400)
         elif data.end - data.start > 30000:
             return JSONResponse(content={"message": "Too long duration."}, status_code=400)
         time_args = [
@@ -52,7 +53,10 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
         time_args = ["-t", str(30)]
         end_time = 30
 
-    dist.write(b"")
+    if os.name == "nt":
+        dist.close()
+    else:
+        dist.write(b"")
     process = await asyncio.create_subprocess_exec(
         FFMPEG_PATH,
         "-i",
@@ -74,12 +78,16 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
     )
     await process.communicate()
     if process.returncode != 0:
+        if os.name == "nt":
+            os.remove(dist.name)
         return JSONResponse(
             content={
                 "message": "Failed to convert.",
                 "ffmpeg_returncode": process.returncode,
             }
         )
+    if os.name == "nt":
+        dist = open(dist.name, "rb")  # type: ignore
     dist.seek(0)
     cut_hash = hashlib.sha1(dist.read()).hexdigest()
     dist.seek(0)
@@ -90,4 +98,7 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
     )
     base.close()
     dist.close()
+    if os.name == "nt":
+        os.remove(base.name)
+        os.remove(dist.name)
     return JSONResponse(content={"hash": cut_hash})
