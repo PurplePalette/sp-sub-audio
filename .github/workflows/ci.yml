@@ -1,7 +1,7 @@
 name: ci python-project-template
 env:
   PROJECT_NAME: python-project-template
-on: [push]
+on: [push, pull_request]
 jobs:
   deploy:
     name: CI
@@ -27,6 +27,11 @@ jobs:
       - name: Run Lint
         run: |
           poetry run pysen run lint
+      - name: Start minio
+        run: |
+          cp .env.test .env
+          docker-compose up -d minio
+          docker-compose up createbuckets
       - name: Run Test
         run: |
           poetry run pytest
