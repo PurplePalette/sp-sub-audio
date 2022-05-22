@@ -21,9 +21,10 @@ with open("./test_song.mp3", "rb") as fd:
 song_hash = hashlib.sha1(song_data).hexdigest()
 
 
-@pytest.fixture
-def upload_test_song():
-    s3_bucket.put_object(Key="test_song.mp3", Body=song_data)
+@pytest.fixture(scope="session", autouse=True)
+def pre_session():
+    s3_bucket.put_object(Key="LevelBgm/" + song_hash, Body=song_data)
+    yield
 
 
 def test_get_root():
