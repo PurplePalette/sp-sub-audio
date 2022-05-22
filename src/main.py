@@ -87,7 +87,7 @@ async def upload(data: PostConvertParams) -> PostConvertResponse:
             }
         )
     if os.name == "nt":
-        dist = open(dist.name, "rb")
+        dist = open(dist.name, "rb")  # type: ignore
     dist.seek(0)
     cut_hash = hashlib.sha1(dist.read()).hexdigest()
     dist.seek(0)

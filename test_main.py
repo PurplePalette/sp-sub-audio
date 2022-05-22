@@ -1,10 +1,10 @@
 import hashlib
-import boto3
 import os
+
+import boto3
+import pytest
 from dotenv import load_dotenv
 from fastapi.testclient import TestClient
-import pytest
-
 from src.main import app
 
 load_dotenv()
