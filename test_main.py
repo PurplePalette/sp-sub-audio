@@ -28,12 +28,14 @@ def pre_session():
 
 
 def test_get_root():
+    """GET /"""
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
 
 def test_post_convert():
+    """POST /convert: valid"""
     response = client.post("/convert", json={"hash": song_hash})
     response_hash = response.json()["hash"]
     assert response.status_code == 200
@@ -42,6 +44,7 @@ def test_post_convert():
 
 
 def test_post_convert_start():
+    """POST /convert: valid, specify start"""
     response = client.post("/convert", json={"hash": song_hash, "start": 10000})
     response_hash = response.json()["hash"]
     assert response.status_code == 200
@@ -50,6 +53,7 @@ def test_post_convert_start():
 
 
 def test_post_convert_start_end():
+    """POST /convert: valid, specify start and end"""
     response = client.post("/convert", json={"hash": song_hash, "start": 10000, "end": 20000})
     response_hash = response.json()["hash"]
     assert response.status_code == 200
@@ -58,6 +62,7 @@ def test_post_convert_start_end():
 
 
 def test_post_convert_end():
+    """POST /convert: valid, specify end"""
     response = client.post("/convert", json={"hash": song_hash, "end": 10000})
     response_hash = response.json()["hash"]
     assert response.status_code == 200
@@ -66,15 +71,24 @@ def test_post_convert_end():
 
 
 def test_post_convert_error_5sec():
+    """POST /convert: invalid, shorter than 5 seconds"""
     response = client.post("/convert", json={"hash": song_hash, "start": 10000, "end": 11000})
     assert response.status_code == 400
 
 
 def test_post_convert_error_5sec_end():
+    """POST /convert: invalid, shorter than 5 seconds, end specified"""
     response = client.post("/convert", json={"hash": song_hash, "end": 1000})
     assert response.status_code == 400
 
 
 def test_post_convert_error_30sec():
+    """POST /convert: invalid, longer than 30 seconds"""
+    response = client.post("/convert", json={"hash": song_hash, "start": 0, "end": 40000})
+    assert response.status_code == 400
+
+
+def test_post_convert_error_30sec_end():
+    """POST /convert: invalid, longer than 30 seconds, end specified"""
     response = client.post("/convert", json={"hash": song_hash, "start": 0, "end": 40000})
     assert response.status_code == 400
